@@ -7,14 +7,13 @@ void main() => runApp(BytebankApp());
   @override
   Widget build(BuildContext context){
     return MaterialApp(
-      home: Scaffold(
-          body: ListaTransferencia(),
-        ),
+      theme: ThemeData.dark(),
+      home: ListaTransferencia(),
       );
     }
   }
 
-class FormularioTransferencia extends StatelessWidget{
+class FormularioTransferencia extends StatelessWidget {
 
   final TextEditingController _ControladorCampoNumeroConta = TextEditingController();
   final TextEditingController _controladorCampoValor = TextEditingController();
@@ -25,7 +24,8 @@ class FormularioTransferencia extends StatelessWidget{
       appBar: AppBar(
         title: const Text('Criando Transferencia!'),
       ),
-      body: Column(
+      body: SingleChildScrollView(
+        child: Column(
         children: <Widget>[
             Editor(
               controlador: _ControladorCampoNumeroConta,
@@ -43,7 +43,8 @@ class FormularioTransferencia extends StatelessWidget{
             child: Text('Confirmar'),
           )
         ]
-      ,)
+        ),
+      )
     );
   }
 }
@@ -89,10 +90,16 @@ class Editor extends StatelessWidget{
   }
 }
 
-  class ListaTransferencia extends StatelessWidget {
+  class ListaTransferencia extends StatefulWidget {
+    final List<Transferencia> _transferencias = [];
 
-  late final List<Transferencia> _transferencias = [];
+    @override
+    State<StatefulWidget> createState(){
+      return ListaTransferenciaState();
+    }
+  }
 
+  class ListaTransferenciaState extends State<ListaTransferencia>{
     @override
     Widget build(BuildContext context){
       return Scaffold(
@@ -100,9 +107,9 @@ class Editor extends StatelessWidget{
           title: const Text('Transferencias'),
         ),
         body: ListView.builder(
-          itemCount: _transferencias.length,
+          itemCount: widget._transferencias.length,
           itemBuilder: (context, indice) {
-            final transferencia = _transferencias[indice];
+            final transferencia = widget._transferencias[indice];
             return ItemTransferencia(transferencia);
           },
         ),
@@ -115,8 +122,12 @@ class Editor extends StatelessWidget{
                 )
               );
               future.then((transferenciaRecebida) => {
-                if(transferenciaRecebida != null)
-                _transferencias.add(transferenciaRecebida)
+                Future.delayed(Duration(seconds: 5), () {
+                  if(transferenciaRecebida != null)
+                    setState(() {
+                      widget._transferencias.add(transferenciaRecebida);
+                  });
+                })
               });
             }, 
             child: Icon(Icons.add),
